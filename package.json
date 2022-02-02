@@ -1,11 +1,12 @@
 {
   "dependencies": {
-    "@sapphire/async-queue": "^1.2.0"
+    "@sapphire/async-queue": "^1.2.0",
+    "@types/node": "^17.0.14",
+    "form-data": "^4.0.0"
   },
   "name": "typescord",
   "version": "1.0.0",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
