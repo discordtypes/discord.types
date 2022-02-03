@@ -26,6 +26,6 @@ export function resolveRouteData(routeId: RouteLike): IRouteData {
   return {
     fullroute: routeId,
     bucketRoute: routeId.replace(/\d{16,19}/g, ':id').replace(/\/reactions\/(.*)/, '/reactions/:reaction'),
-    majorParameters: /^\/(channels|guilds|wehbhooks)\/(\d{16, 19})/.exec(routeId)?.[1] ?? 'global'
+    majorParameter: /^\/(channels|guilds|wehbhooks)\/(\d{16, 19})/.exec(routeId)?.[1] ?? 'global'
   };
 }

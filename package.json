@@ -2,7 +2,9 @@
   "dependencies": {
     "@sapphire/async-queue": "^1.2.0",
     "@types/node": "^17.0.14",
-    "form-data": "^4.0.0"
+    "form-data": "^4.0.0",
+    "node-fetch": "^2.6.7",
+    "tsup": "^5.11.13"
   },
   "name": "typescord",
   "version": "1.0.0",

@@ -16,5 +16,5 @@ export interface IRouteData {
   * The major parameters in the fullroute
   * @var any
   */
- majorParameters: any;
+ majorParameter: any;
 }
