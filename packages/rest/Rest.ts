@@ -1,12 +1,12 @@
 import EventEmitter from "./EventEmiter";
 import {Agent, Agent as httpAgent, AgentOptions as httpAgentOptions} from 'node:http';
-import {Agent as httpsAgent, AgentOptions as httpsAgentOptions} from 'node:http';
+import {Agent as httpsAgent, AgentOptions as httpsAgentOptions} from 'node:https';
 import FormData from 'form-data';
-import * as Routes from '../typescord-api-structures/v9/';
+import * as Routes from '@discordtypesmodules/discordtypes-api-structures/v9';
 import * as Methods from './Utils/Methods';
 import { RequestInit } from 'node-fetch';
 import { Bucket } from "./Bucket";
-import { BASE_API_VERSION, BASE_URL, RouteLike } from "../typescord-api-structures/v9/";
+import { BASE_API_VERSION, BASE_URL, RouteLike } from "@discordtypesmodules/discordtypes-api-structures/v9";
 import { TokenException } from "./Exceptions/TokenException";
 import { IBucket } from "./IBucket";
 import { RestError } from "./Exceptions/RestError";
@@ -15,7 +15,7 @@ import { SWEEP } from "./Events";
 /**
  * Events type for debug
  */
-export type EventsLike = 'rate_limit'|'requests'|'unknow'|'sweep';
+export type EventsLike = 'rate_limit'|'requests'|'unknow'|'sweep'|'debug';
 
 /**
  * The http methods
@@ -107,11 +107,30 @@ export interface RouteData {
  * When 429 error code is expected
  */
 export interface RateLimit {
+  /**
+   * The fullroute used to send the request
+   * @var RouteLike
+   */
+  fullroute: RouteLike;
+
   /** 
    * If the rate limit is global or not
    * @var number
    */
-  global?: boolean;
+  global: boolean;
+
+  /**
+   * The route hash used when the request was send.
+   * @var string
+   */
+  hash: string;
+
+  /**
+   * The method used to send the request
+   * @var httpMethods
+   * @default 'get'
+   */
+  method: httpMethods;
 
   /**
    *  When the rate limit is reset
@@ -149,7 +168,7 @@ export interface RateLimitData {
    * The rate limit scope
    * @var string
    */
-  scope: string;
+  scope?: string;
 }
 
 interface RestOptions {
@@ -227,11 +246,34 @@ interface RestOptions {
    */
   httpAgentOptions?: Omit<httpAgentOptions, 'keepAlive'>;
   /**
+   * If it's true, all the requests are debugging before send
+   * @var boolean
+   * @default true
+   */
+  listenRequests: boolean;
+  /**
+   * An offset to add to the rate limits in milliseconds
+   * @default 50
+   */
+  offset?: number;
+  /**
+   * Amount of retries when a request failed
+   * @var number
+   * @default 5
+   */
+  retries?: number;
+  /**
    * The timeout to send a request
    * @var number
    * @default 5000
    */
   timeout: number;
+  /**
+   * If we must thrown rate limit error when a rate limit expected
+   * @var boolean
+   * @default true
+   */
+  thrownRateLimit?: boolean;
   /**
    * The authorization token needs to access to the api
    * @var string
@@ -349,6 +391,19 @@ export class Rest extends EventEmitter<{
   public bucketTimer?: any;
 
   /**
+   * The global delay when a ratelimit is expected
+   * @var Promise<any>
+   */
+  public globalDelay: Promise<any> = null;
+
+  /**
+   * The time to reset a global rate limit
+   * @var number
+   * @default -1
+   */
+  public globalReset: number = -1;
+
+  /**
    * The global remaining requests in the global bucket
    * @var number
    * @default 50
@@ -383,13 +438,14 @@ export class Rest extends EventEmitter<{
    * Rest Constructor
    * @param RestOptions options
    */
-  public constructor(options: Partial<RestOptions>){
+  public constructor(options: Partial<RestOptions> = {}){
     super();
     this.buckets = new Map<string, IBucket>();
     this.hashes = new Map<string, HashData>();
     this.options = {...this.resolveDefaultOptions(), ...options};
-    this.#token = options.token ?? options.authPrefix  ? options.authPrefix + options.token : `Bot ${options.token}`;
+    this.#token = `${this.options.authPrefix} ${options.token}`
     this.globalRemaining = this.options.globalRequetsPerSecond;
+    this.setupSweepers();
   }
 
   /**
@@ -415,7 +471,7 @@ export class Rest extends EventEmitter<{
             }
           }
          }
-      }, options.hashSweepInterval);
+      }, options.hashSweepInterval).unref();
       if(options.handleSweepers > 1 && options.handleSweepers !== Infinity){
         checkTime(options.handleSweepers)
         this.bucketTimer = setTimeout(() => {
@@ -425,7 +481,7 @@ export class Rest extends EventEmitter<{
               this.debug(SWEEP, `Bucket delete because it's inactive. BucketID: ${v.hashId}.`)
             }
           }
-        }, options.handleSweepers)
+        }, options.handleSweepers).unref()
       }
     }
   }
@@ -463,9 +519,13 @@ public clearHashTimer(): void {
       headers: {},
       httpAgent: new httpsAgent({keepAlive: true}),
       httpAgentOptions: {},
+      listenRequests: true,
+      offset: 50,
       invalidRequestsWarningInterval: 500,
+      retries: 5,
       token: undefined,
       timeout: 5000,
+      thrownRateLimit: true,
       userAgentToAppend: '',
       version: BASE_API_VERSION(),
     }
@@ -476,7 +536,7 @@ public clearHashTimer(): void {
    * @param httpAgentName                                      agent
    * @param httpAgentOptions|httpsAgentOptions    opt
    */
-  public setAgent(agent: httpAgentName|httpAgent|httpsAgent, opt: Omit<httpAgentOptions, 'keepAlive'>): void{
+  public setAgent(agent: httpAgentName|httpAgent|httpsAgent, opt: Omit<httpAgentOptions, 'keepAlive'> = {}): void{
     typeof this.options.httpAgent  == 'string' ? agent === 'https' ? this.options.httpAgent = new httpAgent({...opt, keepAlive: true}) : this.options.httpAgent = new httpsAgent({...opt, keepAlive: true}) : this.options.httpAgent = agent as Agent
   }
 
@@ -518,7 +578,13 @@ public clearHashTimer(): void {
   public resolveRequest(req: RequestData): ResolveRequestData{
    var {options} = this;
 
-  !options.httpAgent ?? options.api.startsWith('https') ? this.options.httpAgent = new httpsAgent({keepAlive: true, ...this.options.httpAgentOptions})  : this.options.httpAgent = new httpAgent({keepAlive: true, ...this.options.httpAgentOptions})
+  if(options.httpAgent){
+    if(options.httpAgent instanceof httpAgent && options.api.startsWith('https')){
+      this.options.httpAgent = new httpsAgent({keepAlive: true, ...options.httpAgentOptions}) 
+    }
+  }else {
+    this.options.httpAgent = new httpsAgent({keepAlive: true, ...options.httpAgentOptions})
+  }
 
    let query = '';
 
@@ -624,7 +690,59 @@ public clearHashTimer(): void {
     var bucket = this.getBucket(hash.hash, routeId.majorParameter)
 
     const {url, options} = this.resolveRequest(data)
-    return bucket.enqueueRequest(url, method, options);
+    return bucket.enqueueRequest(url, routeId, method, options);
   }
+
+  /**
+   * Execute a get method
+   * @param RouteLike route
+   * @param Omit<RequestOptions, 'body'> options
+   * @param any body
+   */
+  public async get(route: RouteLike, options: Omit<RequestOptions, 'body'> = {}, body: any = null){
+    return await this.request({fullroute: route, options: {...options, ...body}, method: Methods.GET})
+  }
+
+  /**
+   * Execute a post method
+   * @param RouteLike route
+   * @param any body
+   * @param Omit<RequestOptions, 'body'> options
+   */
+   public async post(route: RouteLike, body: any = null, options: Omit<RequestOptions, 'body'> = {}){
+     if(body instanceof Object) body = JSON.parse(body)
+    return await this.request({fullroute: route, options: {...options, ...body}, method: Methods.POST})
+  }
+
+   /**
+   * Execute a put method
+   * @param RouteLike route
+   * @param any body
+   * @param Omit<RequestOptions, 'body'> options
+   */
+    public async put(route: RouteLike, body: any = null, options: Omit<RequestOptions, 'body'> = {}){
+      if(body instanceof Object) body = JSON.parse(body)
+     return await this.request({fullroute: route, options: {...options, ...body}, method: Methods.PUT})
+   }
+
+    /**
+   * Execute a patch method
+   * @param RouteLike route
+   * @param any body
+   * @param Omit<RequestOptions, 'body'> options
+   */
+     public async patch(route: RouteLike, body: any = null, options: Omit<RequestOptions, 'body'> = {}){
+      if(body instanceof Object) body = JSON.parse(body)
+     return await this.request({fullroute: route, options: {...options, ...body}, method: Methods.PATCH})
+   }
+
+    /**
+   * Execute a delete method
+   * @param RouteLike route
+   * @param RequestOptions options
+   */
+     public async delete(route: RouteLike, options: RequestOptions= {}){
+     return await this.request({fullroute: route, options: {...options}, method: Methods.DELETE})
+   }
 }
 

@@ -4,3 +4,6 @@ export const RATE_LIMIT = "rate_limit";
 export const REQUEST = "requests";
 /** When a sweep expected */
 export const SWEEP = "sweep";
+/** Simple debug */
+export const DEBUG = "debug";
+
