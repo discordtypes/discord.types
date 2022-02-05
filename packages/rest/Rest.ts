@@ -195,7 +195,7 @@ export interface RateLimitData {
 	scope?: string;
 }
 
-interface RestOptions {
+export interface RestOptions {
 	/**
 	 * The api url
 	 * @var string

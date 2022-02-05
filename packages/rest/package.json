@@ -11,12 +11,16 @@
     "prettier": "^2.5.1"
   },
   "name": "@discordtypesmodules/rest",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["rest", "discord", "discord-api", "api", "rest"],
+  "author": "discord.types",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/discordtypes/discord.types/tree/main/packages/rest"
+  },
   "license": "ISC",
-  "description": ""
+  "description": "An asynchonous rest client for the discord api used with discord.types"
 }

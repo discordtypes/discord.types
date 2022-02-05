@@ -15,6 +15,14 @@ export function BASE_URL(): string{
   return "https://discord.com/api";
 }
 
+//Gateway
+export function GET_GATEWAY_BOT(): RouteLike {
+  return '/gateway/bot' as const;
+}
+export function GET_GATEWAY_BEARER(): RouteLike {
+  return '/gateway' as const;
+}
+
 /**
  * Return a major route id
  * Exemple: toMajorRoute('/channels/886631972233949286') must return '/channels/:id'

@@ -15,7 +15,9 @@ const {Rest} = require('@discordtypesmodules/rest')
 Once this is done, we will be able to start configuring the rest module. We will write 
 ```js
 //var rest corresponds to the variable that will define the rest module
-var rest = new Rest();
+var rest = new Rest({
+  //RestOptions
+});
 ```
 You have different options in the Rest class, I invite you to look at the code to learn more.
 For rest to work, you will have to set the bot token with the function 
@@ -35,7 +37,9 @@ If you followed everything you should have code like this:
 ```js
 const {Rest} = require('@discordtypes/rest')
 
-var rest = new Rest();
+var rest = new Rest({
+  //RestOptions
+});
 rest.setToken('token');
 firstRequest = async() => {
   console.log(await rest.get('/gateway/bot'))

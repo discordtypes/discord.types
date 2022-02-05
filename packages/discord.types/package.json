@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@discordtypesmodules/rest": "^1.0.5",
+    "mime-db": "^1.51.0",
+    "ws": "^8.4.2"
+  }
+}
