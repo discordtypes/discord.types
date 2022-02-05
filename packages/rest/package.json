@@ -1,13 +1,17 @@
 {
   "dependencies": {
-    "@discordtypesmodules/discordtypes-api-structures": "^1.0.2",
+    "@discordtypesmodules/discordtypes-api-structures": "^1.0.4",
     "@sapphire/async-queue": "^1.2.0",
     "@types/node": "^17.0.14",
+    "eslint": "^8.8.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "form-data": "^4.0.0",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "prettier": "^2.5.1"
   },
   "name": "@discordtypesmodules/rest",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

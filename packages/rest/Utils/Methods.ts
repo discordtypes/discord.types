@@ -1,10 +1,10 @@
 /** GET METHOD */
-export const GET = "GET";
+export const GET = 'GET';
 /** POST METHOD */
-export const POST = "GET";
+export const POST = 'POST';
 /** PUT METHOD */
-export const PUT = "GET";
+export const PUT = 'PUT';
 /** PATCH METHOD */
-export const PATCH = "GET";
+export const PATCH = 'PATCH';
 /** DELETE METHOD */
-export const DELETE = "GET";
+export const DELETE = 'DELETE';

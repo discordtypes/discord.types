@@ -1,10 +1,10 @@
-export class RestError extends Error {
+export class CDNError extends Error {
 	/**
-	 * RestError constructor
+	 * CDNError constructor
 	 * @param string message
 	 * @param number code
 	 */
 	public constructor(message: string, code: number = 0) {
-		super(`RestError: ${message}: ${code}`);
+		super(`CDNError: ${message}: ${code}`);
 	}
 }
