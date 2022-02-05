@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+  },
+  "name": "@discordtypesmodules/discordtypes-api-structures",
+  "version": "1.0.4",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord",
+    "typescript",
+    "api",
+    "structures"
+  ],
+  "author": "discord.types",
+  "license": "ISC",
+  "description": "The discord api structures used for discord.types"
+}
