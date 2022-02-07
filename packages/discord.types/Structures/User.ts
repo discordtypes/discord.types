@@ -6,9 +6,9 @@ export type UserPresenceActivityTypeLike = 0|1|2|3|4|5;
 export interface UserPresence {
   /**
    * unix time (in milliseconds) of when the client went idle, or null if the client is not idle
-   * @var number|undefined
+   * @var number|null
   **/
-  since: number|undefined;
+  since: number|null;
   /**
    * The user's activities
    * @var UserActivity[]
@@ -56,7 +56,7 @@ interface UserActivity {
    * What the player is currently doing
    * @var string|null
    */
-  details?: string|undefined;
+  details?: string|null;
   /**
    * the user's current party status
    * @var string|null
