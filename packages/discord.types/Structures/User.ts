@@ -21,7 +21,7 @@ export interface UserPresence {
   status: UserPresenceStatusLike;
 }
 
-interface UserActivity {
+export interface UserActivity {
   /**
    * The activity's name
    * @var string

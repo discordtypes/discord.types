@@ -1,4 +1,4 @@
-import { RoleData, EmojiData, VoiceSateData, ChannelData, PresenceUpdateData, StageInstanceData } from ".";
+import { RoleData, EmojiData, VoiceSateData, ChannelData, PresenceUpdateData, StageInstanceData, UserData } from ".";
 import { Snowflake } from "..";
 import { StickerData } from "./StickerData";
 
@@ -155,6 +155,11 @@ export interface IGuild {
    */
   voice_states?: VoiceSateData[];
   /**
+   * users in the guild
+   * @var GuildMember[]
+   */
+  members: GuildMember[];
+  /**
    * 	channels in the guild
    * @var ChannelData[]
    */
@@ -309,9 +314,96 @@ export enum SystemChannelsFLAGS {
 'SUPPRESS_JOIN_NOTIFICATION_REPLIES' = 1 << 3  
 }
 
-export interface GuildMember {}
+export interface GuildMember {
+  /**
+   * the user this guild member represents
+   * @var UserData
+   */
+  user?: UserData;
+  /**
+   * this user's guild nickname
+   * @var string
+   */
+  nick?: string;
+  /**
+   * the member's guild avatar hash
+   * @var string
+   */
+  avatar?: string|null;
+  /**
+   * array of role object ids
+   * @var Snowflake[]
+   */
+  roles: Snowflake[];
+  /**
+   * when the user joined the guild
+   * @var number
+   */
+  joined_at: number;
+  /**
+   * when the user started boosting the guild
+   * @var number
+   */
+  premium_since?: number|null;
+  /**
+    * whether the user is deafened in voice channels
+    * @var boolean
+  */	
+  deaf: boolean;
+  /**
+   * whether the user is muted in voice channels
+   * @var boolean
+   */
+  mute: boolean;
+  /**
+   * whether the user has not yet passed the guild's Membership Screening requirements
+   * @var boolean
+   */
+  pending?: boolean;
+  /**
+   * total permissions of the member in the channel, including overwrites, returned when in the interaction object
+   * @var string
+   */
+  permissions?: string;
+  /**
+   * when the user's timeout will expire and the user will be able to communicate in the guild again, null or a 
+   * time in the past if the user is not timed out
+   * @var number
+   */
+  communication_disabled_until?: number;
+}
 
-export interface GuildWelcomeScreen {}
+export interface GuildWelcomeScreen {
+  /**
+   * the server description shown in the welcome screen
+   * @var string
+   */
+  description: string|null;
+
+}
+
+export interface GuildWelcomeScreenChannel {
+  /**
+   * the channel's id
+   * @var Snowflake
+   */
+  channel_id: Snowflake;
+  /**
+   * the description shown for the channel
+   * @var string
+   */
+  description: string;
+  /**
+   * the emoji id, if the emoji is custom
+   * @var Snowflake
+   */
+  emoji_id: Snowflake|null;
+  /**
+   * the emoji name if custom, the unicode character if standard, or null if no emoji is set
+   * @var string
+   */
+  emoji_name: string|null;
+}
 
 export enum GuildNsfwLevel {
   'DEFAULT' = 0,
@@ -320,4 +412,113 @@ export enum GuildNsfwLevel {
   'AGE_RESTRICTED' = 3
 }
 
-export interface GuildScheduledEvent {}
+export interface GuildScheduledEvent {
+  /**
+   * the id of the scheduled event
+   * @var Snowflake
+   */
+  id: Snowflake;
+  /**
+   * the guild id which the scheduled event belongs to
+   * @var Snowflake
+   */
+  guild_id: Snowflake;
+  /**
+   * the channel id in which the scheduled event will be hosted, or null if scheduled entity type is EXTERNAL
+   * @var Snowflake
+   */
+  channel_id: Snowflake|null;
+  /**
+   * the id of the user that created the scheduled event
+   * @var Snowflake
+   */
+  creator_id: Snowflake|null;
+  /**
+   * the name of the scheduled event (1-100 characters)
+   * @var string
+   */
+  name: string;
+  /**
+   * the description of the scheduled event (1-1000 characters)
+   * @var string
+   */
+  description?: string;
+  /**
+   * the time the scheduled event will start
+   * @var number
+   */
+  scheduled_start_time: number;
+  /**
+   * the time the scheduled event will end, required if entity_type is EXTERNAL
+   * @var number
+   */
+  scheduled_end_time: number|null;
+  /**
+   * the privacy level of the scheduled event
+   * @var number
+   */
+  privacy_level: number;
+  /**
+   * the status of the scheduled event
+   * @var number
+   */
+  status: number;
+  /**
+   * the type of the scheduled event
+   * @var number
+   */
+  entity_type: number;
+  /**
+   * the id of an entity associated with a guild scheduled event
+   * @var Snowflake
+   */
+  entity_id: Snowflake|null;
+  /**
+   * additional metadata for the guild scheduled event
+   * @var GuildScheduledEventEntityTypeMetadata
+   */
+  entity_metadata: GuildScheduledEventEntityTypeMetadata;
+  /**
+   * the user that created the scheduled event
+   * @var UserData
+   */
+  creator?: UserData;
+  /**
+   * the number of users subscribed to the scheduled event
+   * @var number
+   */
+  user_count?: number;
+  /**
+   * the cover image hash of the scheduled event
+   * @var string
+   */
+  image: string|null;
+}
+
+export enum GuildScheduledEventStatus {
+  'SCHEDULED' = 1,
+  'ACTIVE' = 2,
+  'COMPLETED' = 3,
+  'CANCELED' = 4
+}
+
+export enum GuildScheduledEventPrivacyLevel {
+  /**
+   * the scheduled event is only accessible to guild members
+   */
+  'GUILD_ONLY' = 2
+}
+
+export enum GuildScheduledEventEntityTypes {
+  'STAGE_INSTANCE' = 1,
+  'VOICE' = 2,
+  'EXTERNAL' = 3
+}
+
+export interface GuildScheduledEventEntityTypeMetadata {
+  /**
+   * location of the event (1-100 characters)
+   * @var string
+   */
+  location: string;
+}
