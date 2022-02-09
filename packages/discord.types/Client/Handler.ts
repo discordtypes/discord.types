@@ -10,8 +10,8 @@ export class Handler {
   public static async handle(client: Client, d: GatewayDispatchData){
     switch(d.t){
       case Events.GUILD_CREATE:
-        console.log(d.d)
-       //ToDo: Handle this
+        //ToDo: Handle this
+        break;
       case Events.READY:
         READY.run(client, d);
         break;

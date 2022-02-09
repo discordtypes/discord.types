@@ -1,4 +1,5 @@
-import { Snowflake } from "../../discordtypes-api-structures/v9";
+import { DiscordSnowflake, Snowflake, UserData } from "../../discordtypes-api-structures/v9";
+import { Client } from "../Client";
 
 export type UserPresenceStatusLike = 'online'|'dnd'|'idle'|'invisible'|'offline';
 export type UserPresenceActivityTypeLike = 0|1|2|3|4|5;
@@ -18,7 +19,15 @@ export interface UserPresence {
    * The user status
    * @var UserPresenceStatusLike
    */
-  status: UserPresenceStatusLike;
+  status: UserPresenceStatusLike|string;
+}
+
+export enum UserPresenceStatus {
+  "Online" = "online",
+  "DND" = "dnd",
+  "Idle" = "idle",
+  "Invisible" = "invisible",
+  "Offline" = "offline" 
 }
 
 export interface UserActivity {
@@ -41,7 +50,7 @@ export interface UserActivity {
    * When the user activity is created
    * @var number
    */
-  created_at: number;
+  created_at?: number;
   /**
    * unix timestamps for start and/or end of the game
    * @var UserActivityTimestamps
@@ -94,9 +103,9 @@ export interface UserActivity {
   flags?: number;
   /**
    * the custom buttons shown in the Rich Presence (max 2)
-   * @var UserActivityButtons
+   * @var UserActivityButtons[]
    */
-  buttons?: UserActivityButtons;
+  buttons?: UserActivityButtons[];
 }
 
 export interface UserActivityTimestamps {
@@ -193,4 +202,106 @@ export interface UserActivityButtons {
    * @var string
    */
   url: string;
+}
+
+export class User {
+  public id: `${bigint}`;
+  public username: string;
+  public discriminator: number;
+  public created_at: number;
+  public avatar: string|null;
+  public bot?: false;
+  public system?: boolean;
+  public mfa_enabled?: boolean;
+  public banner?: string|null;
+  public accent_color?: number;
+  public locale?: string;
+  public verified?: boolean;
+  public email?: string;
+  public flags?: number;
+  public public_flags?: number;
+
+  /**
+   * User constructor
+   * @param Client client
+   * @param UserData data
+   */
+  public constructor(protected client: Client, private data: UserData){
+    this.id = data.id
+    this.username = data.username
+    this.discriminator = data.discriminator
+    this.avatar = data.avatar
+    if('bot' in data){
+      this.bot = data.bot
+    }
+    if('system' in data){
+      this.system = data.system
+    }
+    if('mfa_enabled' in data){
+      this.mfa_enabled = data.mfa_enabled
+    }
+    if('banner' in data){
+      this.banner = data.banner
+    }
+    if('accent_color' in data){
+      this.accent_color = data.accent_color
+    }
+    if('locale' in data){
+      this.locale = data.locale
+    }
+    if('verified' in data){
+      this.verified = data.verified
+    }
+    if('email' in data){
+      this.email = data.email
+    }
+    if('flags' in data){
+      this.flags = data.flags
+    }
+    if('public_flags' in data){
+      this.public_flags = data.public_flags
+    }
+
+    this.created_at = new DiscordSnowflake(this.id).toTimestamp();
+  }
+
+  /**
+   * Return the avatar of the user. If the avatar hash is null, retourning null
+   * @returns
+   */
+   public avatarUrl(): string|null {
+    return this.avatar ? this.client.api.cdn.userAvatar(this.id, this.avatar) : null
+  }
+
+  /**
+   * Return the default user avatar url
+   * @returns
+   */
+  public defaultAvatarUrl(): string {
+    return this.client.api.cdn.defaultUserAvatarUrl(this.discriminator);
+  }
+
+  /**
+   * Return the actual avatar url of the user
+   * @returns
+   */
+  public displayAvatarUrl(): string {
+    return this.avatar ? this.avatarUrl() : this.defaultAvatarUrl();
+  }
+
+  /**
+   * Return a user-readable string value
+   * @returns
+   */
+  public __toString(): string {
+    return this.username;
+  }
+
+  /**
+   * Return a user-readble json value
+   * @returns
+   */
+  public __toJSON(): Object {
+    return this.data;
+  }
 }

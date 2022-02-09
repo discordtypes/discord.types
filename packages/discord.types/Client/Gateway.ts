@@ -13,6 +13,7 @@ import { InvalidTokenException } from '../Exceptions/InvalidTokenException';
 import { Client } from './';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { Handler } from './Handler';
+import { UserPresence, UserPresenceStatus } from '../Structures';
 
 export class Gateway {
 	/**
@@ -124,10 +125,12 @@ export class Gateway {
 	 * Idetifying to the gateway
 	 */
 	public identify() {
-		this.send(OPCodes.Identify, {
+		var identify: GatewayIndentifyData = {
 			...this.resolveIdentifyOptions(),
-			...this.identifyOptions,
-		});
+			...this.identifyOptions
+		}
+		identify.presence = this.#client.user ? this.#client.user.resolvePresence() : this.resolveBasePresence();
+		this.send(OPCodes.Identify, identify);
 		this.#client.debug('Sending gateway identify event');
 	}
 
@@ -237,6 +240,19 @@ export class Gateway {
 	}
 
 	/**
+	 * Resolve the base presence
+	 * @returns
+	 */
+	public resolveBasePresence(): UserPresence {
+    var basePresence: UserPresence = {
+      since: Date.now(),
+      activities: [],
+      status: UserPresenceStatus.Online
+    }
+    return basePresence
+	}
+
+	/**
 	 * Resume the gateway connection when it's close
 	 */
 	public resume() {
@@ -287,5 +303,12 @@ export class Gateway {
 	 */
 	public setIdentifyOptions(options: Partial<GatewayIndentifyData>): void {
 		this.identifyOptions = options;
+	}
+
+	/**
+	 * Update the client presence
+	 */
+	public updatePresence(): void {
+		this.send(OPCodes.Update_Presence, this.#client.user.presence);
 	}
 }

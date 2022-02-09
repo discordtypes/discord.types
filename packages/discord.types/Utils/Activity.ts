@@ -9,3 +9,12 @@ export enum ActivityFLAGS {
 	'PARTY_PRIVACY_VOICE_CHANNEL' = 1 << 7,
 	'EMBEDDED' = 1 << 8,
 }
+
+export enum ActivityType {
+	'Game',
+	'Streaming',
+	'Listening',
+	'Watching',
+	'Custom',
+	'Competing'
+}

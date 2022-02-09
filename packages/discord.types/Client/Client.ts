@@ -1,6 +1,7 @@
 import { EventEmitter, Rest, RestOptions } from '@discordtypesmodules/rest';
 import { Gateway } from '.';
 import { GuildManager } from '../Managers';
+import { ClientUser } from '../Structures';
 import { Intents } from '../Utils';
 
 export interface ClientOptions {
@@ -64,6 +65,12 @@ export class Client extends EventEmitter<{
 	 * @var string
 	 */
 	public token?: string | undefined;
+
+	/**
+	 * The client user class, set when the ready event was received
+	 * @var ClientUser
+	 */
+	public user?: ClientUser;
 
 	/**
 	 * The Gateway class used to receive and send Discord OP Codes
