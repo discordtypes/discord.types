@@ -1,4 +1,5 @@
 export enum OPCodes {
+  'Dispatch' = 0,
   'Heartbeat' = 1,
   'Identify' = 2,
   'Resume' = 6,

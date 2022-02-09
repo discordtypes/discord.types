@@ -1,16 +1,18 @@
 import {
 	GET_GATEWAY_BEARER,
 	GET_GATEWAY_BOT,
-	GatewayDispatchData,
 	OPCodes,
 	GatewayIndentifyData,
 	GatewayResumeData,
+	GatewayPayloadData,
+	GatewayDispatchData,
 } from '../../discordtypes-api-structures/v9';
 import { WebSocket } from 'ws';
 import { UnexpectedGatewayException } from '../Exceptions';
 import { InvalidTokenException } from '../Exceptions/InvalidTokenException';
 import { Client } from './';
 import { setTimeout as sleep } from 'node:timers/promises';
+import { Handler } from './Handler';
 
 export class Gateway {
 	/**
@@ -163,9 +165,13 @@ export class Gateway {
 	 * OnMessage WebSocket event
 	 * @param GatewayDispatchData d
 	 */
-	private onWsMessage(datas: GatewayDispatchData) {
+	private onWsMessage(datas: GatewayPayloadData) {
 		if (datas.s) this.sequence = datas.s;
 		switch (datas.op) {
+			case OPCodes.Dispatch:
+				this.#client.debug(`Receiving ${datas.t} event, handle this...`);
+				Handler.handle(this.#client, datas as GatewayDispatchData);
+				break;
 			case OPCodes.Hello:
 				this.#client.debug(
 					'Receive the Hello event. Start manage heartbeat and connecting to the gateway.',

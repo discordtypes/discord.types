@@ -1,5 +1,6 @@
 //TYPES
 
+import { Snowflake } from ".";
 import { IRouteData } from "./IRouteData";
 
 /**
@@ -21,6 +22,11 @@ export function GET_GATEWAY_BOT(): RouteLike {
 }
 export function GET_GATEWAY_BEARER(): RouteLike {
   return '/gateway' as const;
+}
+
+//Guilds
+export function GUILD(guildId: Snowflake): RouteLike {
+  return `/guilds/${guildId}`;
 }
 
 /**

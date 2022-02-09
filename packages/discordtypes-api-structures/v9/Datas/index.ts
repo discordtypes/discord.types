@@ -4,6 +4,7 @@ export * from './EmojiData';
 export * from './GatewayDispatchData';
 export * from './GatewayIdentifyData'
 export * from './GatewayResumeData';
+export * from './GatewayPayloadData';
 export * from './GuildData';
 export * from './PresenceUpdateData';
 export * from './RoleData';

@@ -7,7 +7,7 @@ import { Collection } from "../Utils";
 
 export class GuildManager extends CacheManager {
   public constructor(client: Client){
-    super(client, new Collection<Snowflake, IGuild>());
+    super(client, new Collection<Snowflake, IGuild|Guild>());
   }
 
   /** 
@@ -15,7 +15,7 @@ export class GuildManager extends CacheManager {
    * @param Guild guild
   **/
   public _add(guild: Guild): void {
-    !this.cache.has(guild.id) ?? this.cache.set(guild.id, guild)
+    this.cache.set(guild.id, guild)
   }
 
   /**

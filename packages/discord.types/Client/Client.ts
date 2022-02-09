@@ -1,5 +1,6 @@
 import { EventEmitter, Rest, RestOptions } from '@discordtypesmodules/rest';
 import { Gateway } from '.';
+import { GuildManager } from '../Managers';
 import { Intents } from '../Utils';
 
 export interface ClientOptions {
@@ -30,12 +31,21 @@ export interface ClientOptions {
 export class Client extends EventEmitter<{
 	// Used to debugging
 	debug;
+
+	//The ready event
+	ready;
 }> {
 	/**
 	 * The Rest class used to send all the requests to the Discord Rest API
 	 * @var Rest
 	 */
 	public api: Rest;
+
+	/**
+	 * The guild manager
+	 * @var GuildManager
+	 */
+	public guilds: GuildManager;
 
 	/**
 	 * The solved intents
@@ -67,6 +77,8 @@ export class Client extends EventEmitter<{
 	 */
 	public constructor(options: Partial<ClientOptions> = {}) {
 		super();
+
+		//initializing basics options
 		this.options = { ...this.resolveClientOptions(), ...options };
 		this.token = this.options.token
 			? `${this.options.authPrefix} ${this.options.token}`
@@ -74,6 +86,9 @@ export class Client extends EventEmitter<{
 		this.api = options.token ? new Rest({ token: this.token }) : new Rest();
 		this.ws = new Gateway(this);
 		this.intents = Intents.resolveIntents(this.options.intents);
+
+		//initializing all the managers
+		this.guilds = new GuildManager(this);
 	}
 
 	/**
