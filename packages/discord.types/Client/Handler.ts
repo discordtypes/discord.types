@@ -1,5 +1,6 @@
 import { Client, Events, READY } from ".";
 import { GatewayDispatchData } from "../../discordtypes-api-structures/v9";
+import { GUILD_CREATE } from "./Actions/GUILD_CREATE";
 
 export class Handler {
   /**
@@ -10,7 +11,7 @@ export class Handler {
   public static async handle(client: Client, d: GatewayDispatchData){
     switch(d.t){
       case Events.GUILD_CREATE:
-        //ToDo: Handle this
+        GUILD_CREATE.run(client, d);
         break;
       case Events.READY:
         READY.run(client, d);

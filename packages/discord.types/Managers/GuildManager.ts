@@ -10,14 +10,6 @@ export class GuildManager extends CacheManager {
     super(client, new Collection<Snowflake, IGuild|Guild>());
   }
 
-  /** 
-   * Add a guild to the cache
-   * @param Guild guild
-  **/
-  public _add(guild: Guild): void {
-    this.cache.set(guild.id, guild)
-  }
-
   /**
    * Fetch a guild from the cache
    * @param Snowflake guildId

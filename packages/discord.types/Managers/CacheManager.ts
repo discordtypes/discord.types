@@ -17,4 +17,22 @@ export class CacheManager {
   public resolve(id: Snowflake): any {
     return this.cache.has(id) ? this.cache.get(id) : null; 
   }
+
+
+  /** 
+   * Add an object to the cache
+   * @param any guild
+  **/
+   public _add(d: any): void {
+    this.cache.set(d.id, d)
+  }
+
+  /**
+   * Update an object from the cache
+   * @param any datas
+   */
+  public _update(datas: any){
+    this.cache.delete(datas.id);
+    this._add(datas);
+  }
 }

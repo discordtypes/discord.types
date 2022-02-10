@@ -14,6 +14,7 @@ import {
 import { StickerData } from '../../discordtypes-api-structures/v9/Datas/StickerData';
 import { Client } from '../Client';
 import * as Routes from '../../discordtypes-api-structures/v9/Routes';
+import { ChannelManager } from '../Managers';
 
 export class Guild {
 	public id: Snowflake;
@@ -47,7 +48,7 @@ export class Guild {
 	public member_count?: number;
 	public voice_states?: VoiceSateData[];
 	public members: GuildMember[];
-	public channels?: ChannelData[];
+	public channels?: ChannelManager;
 	public threads?: ChannelData[];
 	public presences?: PresenceUpdateData[];
 	public max_presences?: number;
@@ -83,7 +84,10 @@ export class Guild {
 		if (d.unavailable){
 			this.unavailable = true;
 		}else {
-			//ToDo: Patch all the datas for available guilds
+			this.channels = new ChannelManager(this.client);
+			d.channels.forEach((c) => {
+				this.channels._add(c)
+			})
 		}
 	}
 

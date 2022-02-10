@@ -33,6 +33,9 @@ export class Client extends EventEmitter<{
 	// Used to debugging
 	debug;
 
+	//When a guild is created
+	guildCreate;
+
 	//The ready event
 	ready;
 }> {
